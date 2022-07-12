@@ -22,8 +22,10 @@
 #include <vector>
 #include <mutex>
 #include <g3log/g3log.hpp>
+#include <psapi.h>
 
 #pragma comment(lib, "dbghelp.lib")
+#pragma comment(lib, "psapi.lib")
 
 
 #if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
@@ -110,7 +112,42 @@ namespace {
       }
    }
 
+   std::string getAddressInformation(std::uintptr_t address)
+   {
+       std::stringstream ss;
+       HMODULE hMods[1024];
+       DWORD cbNeeded;
+       MODULEINFO info;
+       unsigned int i;
 
+
+       if (EnumProcessModules(GetCurrentProcess(), hMods, sizeof(hMods), &cbNeeded))
+       {
+           for (i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
+           {
+               char szModName[MAX_PATH];
+
+               if (GetModuleFileNameExA(GetCurrentProcess(), hMods[i], szModName,
+                   sizeof(szModName) / sizeof(char)))
+               {
+                   if (GetModuleInformation(GetCurrentProcess(), hMods[i], &info, sizeof(info)))
+                   {
+                       auto base = (uintptr_t)hMods[i];
+                       auto max = base + info.SizeOfImage;
+
+                       if (address > base && address < max)
+                       {
+                           ss << szModName << std::uppercase << std::hex << "+0x" << address - base;
+                           return ss.str();
+                       }
+                   }
+               }
+           }
+       }
+
+       ss << std::uppercase << std::hex << "0x" << address;
+       return ss.str();
+   }
 
    // extract readable text from a given stack frame. All thanks to
    // using SymFromAddr and SymGetLineFromAddr64 with the stack pointer
@@ -129,13 +166,19 @@ namespace {
       line.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
       std::string lineInformation;
       std::string callInformation;
-      if (SymFromAddr(GetCurrentProcess(), addr, &displacement64, symbol)) {
+      if (SymFromAddr(GetCurrentProcess(), addr, &displacement64, symbol)) 
+      {
          callInformation.append(" ").append(std::string(symbol->Name, symbol->NameLen));
          if (SymGetLineFromAddr64(GetCurrentProcess(), addr, &displacement, &line)) {
             lineInformation.append("\t").append(line.FileName).append(" L: ");
             lineInformation.append(std::to_string(line.LineNumber));
          }
       }
+      else
+      {
+          callInformation.append(" ").append(getAddressInformation(addr));
+      }
+
       frame_dump.append(lineInformation).append(callInformation);
       return frame_dump;
    }
