@@ -129,7 +129,7 @@ namespace {
 
                if (GetModuleFileNameExA(GetCurrentProcess(), hMods[i], szModName,
                    sizeof(szModName) / sizeof(char)))
-               {
+               { 
                    if (GetModuleInformation(GetCurrentProcess(), hMods[i], &info, sizeof(info)))
                    {
                        auto base = (uintptr_t)hMods[i];
