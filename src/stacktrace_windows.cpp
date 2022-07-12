@@ -127,7 +127,7 @@ namespace {
            {
                char szModName[MAX_PATH];
 
-               if (GetModuleFileNameExA(GetCurrentProcess(), hMods[i], szModName,
+               if (GetModuleBaseNameA(GetCurrentProcess(), hMods[i], szModName,
                    sizeof(szModName) / sizeof(char)))
                { 
                    if (GetModuleInformation(GetCurrentProcess(), hMods[i], &info, sizeof(info)))
