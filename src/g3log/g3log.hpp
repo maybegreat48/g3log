@@ -66,7 +66,7 @@ namespace g3 {
    void initializeLogging(LogWorker *logger);
 
 
-   /** setFatalPreLoggingHook() provides an optional extra step before the fatalExitHandler is called
+   /** setFatalPriorLoggingHook() provides an optional extra step before the fatalExitHandler is called
     *
     * Set a function-hook before a fatal message will be sent to the logger
     * i.e. this is a great place to put a break point, either in your debugger
@@ -74,16 +74,16 @@ namespace g3 {
     * This will be reset to default (does nothing) at initializeLogging(...);
     *
     * Example usage:
-    * Windows: g3::setFatalPreLoggingHook([]{__debugbreak();}); // remember #include <intrin.h>
+    * Windows: g3::setFatalPriorLoggingHook([]{__debugbreak();}); // remember #include <intrin.h>
     *         WARNING: '__debugbreak()' when not running in Debug in your Visual Studio IDE will likely
     *                   trigger a recursive crash if used here. It should only be used when debugging
     *                   in your Visual Studio IDE. Recursive crashes are handled but are unnecessary.
     *
-    * Linux:   g3::setFatalPreLoggingHook([]{ raise(SIGTRAP); });
+    * Linux:   g3::setFatalPriorLoggingHook([]{ raise(SIGTRAP); });
     */
-   void setFatalPreLoggingHook(std::function<void(void)>  pre_fatal_hook);
+   void setFatalPriorLoggingHook(std::function<void(void)>  pre_fatal_hook);
 
-   /** If the @ref setFatalPreLoggingHook is not enough and full fatal exit handling is needed then
+   /** If the @ref setFatalPriorLoggingHook is not enough and full fatal exit handling is needed then
     * use "setFatalExithandler".  Please see g3log.cpp and crashhandler_windows.cpp or crashhandler_unix for
     * example of restoring signal and exception handlers, flushing the log and shutting down.
     */

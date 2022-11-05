@@ -83,7 +83,7 @@ namespace g3 {
       g_logger_instance = bgworker;
       // by default the pre fatal logging hook does nothing
       // if it WOULD do something it would happen in
-      setFatalPreLoggingHook(g_pre_fatal_hook_that_does_nothing);
+      setFatalPriorLoggingHook(g_pre_fatal_hook_that_does_nothing);
       // recursive crash counter re-set to zero
       g_fatal_hook_recursive_counter.store(0);
    }
@@ -95,7 +95,7 @@ namespace g3 {
    *  It will be reset to do nothing in ::initializeLogging(...)
    *     so please call this function, if you ever need to, after initializeLogging(...)
    */
-   void setFatalPreLoggingHook(std::function<void(void)>  pre_fatal_hook) {
+   void setFatalPriorLoggingHook(std::function<void(void)>  pre_fatal_hook) {
       static std::mutex m;
       std::lock_guard<std::mutex> lock(m);
       g_fatal_pre_logging_hook = pre_fatal_hook;
@@ -140,9 +140,9 @@ namespace g3 {
        */
       bool shutDownLoggingForActiveOnly(LogWorker* active) {
          if (isLoggingInitialized() && nullptr != active && (active != g_logger_instance)) {
-            LOG(WARNING) << "\n\t\tAttempted to shut down logging, but the ID of the Logger is not the one that is active."
+            LOG(WARNING) << "\n\t\tAttempted to shut logging down, but the ID of the Logger doesn't match the active one."
                          << "\n\t\tHaving multiple instances of the g3::LogWorker is likely a BUG"
-                         << "\n\t\tEither way, this call to shutDownLogging was ignored"
+                         << "\n\t\tEither way, this shutDownLogging call was ignored"
                          << "\n\t\tTry g3::internal::shutDownLogging() instead";
             return false;
          }
@@ -167,7 +167,7 @@ namespace g3 {
             auto fatalhook = g_fatal_pre_logging_hook;
             // In case the fatal_pre logging actually will cause a crash in its turn
             // let's not do recursive crashing!
-            setFatalPreLoggingHook(g_pre_fatal_hook_that_does_nothing);
+            setFatalPriorLoggingHook(g_pre_fatal_hook_that_does_nothing);
             ++g_fatal_hook_recursive_counter; // thread safe counter
             // "benign" race here. If two threads crashes, with recursive crashes
             // then it's possible that the "other" fatal stack trace will be shown
@@ -179,7 +179,7 @@ namespace g3 {
             if (g_fatal_hook_recursive_counter.load() > 1) {
                message.get()->write()
                .append("\n\n\nWARNING\n"
-                       "A recursive crash detected. It is likely the hook set with 'setFatalPreLoggingHook(...)' is responsible\n\n")
+                       "A recursive crash detected. Perhaps the hook set with 'setFatalPriorLoggingHook(...)' is responsible\n\n")
                .append("---First crash stacktrace: ").append(first_stack_trace).append("\n---End of first stacktrace\n");
             }
             FatalMessagePtr fatal_message { std::make_unique<FatalMessage>(*(message._move_only.get()), fatal_signal) };

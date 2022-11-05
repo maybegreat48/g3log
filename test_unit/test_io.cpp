@@ -354,7 +354,7 @@ TEST(LogTest, LOGF__FATAL) {
 TEST(LogTest, FatalSIGTERM__UsingDefaultHandler) {
    RestoreFileLogger logger(log_directory);
    g_fatal_counter.store(0);
-   g3::setFatalPreLoggingHook(fatalCounter);
+   g3::setFatalPriorLoggingHook(fatalCounter);
    raise(SIGTERM);
    logger.reset();
    EXPECT_EQ(g_fatal_counter.load(), size_t{1});
@@ -421,7 +421,7 @@ namespace {
 TEST(LogTest, FatalSIGTERM__UsingCustomHandler) {
    RestoreFileLogger logger(log_directory);
    g_fatal_counter.store(0);
-   g3::setFatalPreLoggingHook(fatalCounter);
+   g3::setFatalPriorLoggingHook(fatalCounter);
    installCustomSIGTERM();
    g3::overrideSetupSignals({ {SIGABRT, "SIGABRT"}, {SIGFPE, "SIGFPE"}, {SIGILL, "SIGILL"}});
 
@@ -442,7 +442,7 @@ TEST(LogTest, FatalSIGTERM__VerifyingOldCustomHandler) {
    customFatalCounter.store(0);
    lastEncounteredSignal.store(0);
 
-   g3::setFatalPreLoggingHook(fatalCounter);
+   g3::setFatalPriorLoggingHook(fatalCounter);
    installCustomOldSIGTERM();
    g3::overrideSetupSignals({ {SIGABRT, "SIGABRT"}, {SIGFPE, "SIGFPE"}, {SIGILL, "SIGILL"}, {SIGTERM, "SIGTERM"}});
    g3::restoreSignalHandler(SIGTERM); // revert SIGTERM installation
@@ -470,7 +470,7 @@ TEST(LogTest, LOG_preFatalLogging_hook) {
       RestoreFileLogger logger(log_directory);
       ASSERT_FALSE(mockFatalWasCalled());
       g_fatal_counter.store(0);
-      g3::setFatalPreLoggingHook(fatalCounter);
+      g3::setFatalPriorLoggingHook(fatalCounter);
       LOG(FATAL) << "This message is fatal";
       logger.reset();
       EXPECT_EQ(g_fatal_counter.load(), size_t{1});
@@ -651,7 +651,7 @@ TEST(CustomLogLevels, AddFatal) {
    EXPECT_TRUE(g3::internal::wasFatal(DEADLY));
    g_fatal_counter.store(0);
    ASSERT_FALSE(mockFatalWasCalled());
-   g3::setFatalPreLoggingHook(fatalCounter);
+   g3::setFatalPriorLoggingHook(fatalCounter);
 #ifdef G3_DYNAMIC_LOGGING
    g3::only_change_at_initialization::addLogLevel(DEADLY, true);
 #endif

@@ -237,7 +237,7 @@ The default behaviour for G3log is to catch several fatal events before they for
    You can define a custom call back function that will be called before the fatal signal handling re-emits the `fatal` signal. See [src/g3log/g3log.hpp](https://github.com/KjellKod/g3log/tree/master/src/g3log/g3log.hpp) for details. 
    ```
    // Example of how to enforce important shutdown cleanup even in the event of a fatal crash: 
-   g3::setFatalPreLoggingHook([]{ cleanup(); });
+   g3::setFatalPriorLoggingHook([]{ cleanup(); });
    ```
    
 ### <a name="fatal_handling_disabled">Disable fatal handling</a>

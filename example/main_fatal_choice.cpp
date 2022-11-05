@@ -280,7 +280,7 @@ namespace
 void breakHere() {
    std::ostringstream oss;
    oss  << "Fatal hook function: " << __FUNCTION__ << ":" << __LINE__  << " was called";
-   oss << " through g3::setFatalPreLoggingHook(). setFatalPreLoggingHook should be called AFTER g3::initializeLogging()" << std::endl;
+   oss << " through g3::setFatalPriorLoggingHook(). setFatalPriorLoggingHook should be called AFTER g3::initializeLogging()" << std::endl;
    LOG(G3LOG_DEBUG) << oss.str();
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
    __debugbreak();
@@ -292,7 +292,7 @@ int main(int argc, char **argv)
    auto worker = g3::LogWorker::createLogWorker();
    auto handle= worker->addDefaultLogger(argv[0], path_to_log_file);
    g3::initializeLogging(worker.get());
-   g3::setFatalPreLoggingHook(&breakHere);
+   g3::setFatalPriorLoggingHook(&breakHere);
    std::future<std::string> log_file_name = handle->call(&g3::FileSink::fileName);
 
    std::cout << "**** G3LOG FATAL EXAMPLE ***\n\n"

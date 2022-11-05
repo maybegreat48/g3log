@@ -6,3 +6,8 @@ build_clang
 build_travis
 gtest-1.7.0
 *~
+/out/build/x64-Debug
+/src/g3log/generated_definitions.hpp
+/.vs
+*.vcxproj
+*.filters

@@ -11,7 +11,7 @@ G3log is an asynchronous logger with three main features:
 
 The super quick introduction to g3log can be seen in the steps 1 - 9 below. 
 
-For more in-depth information please see the full usage description in [g3log.md](g3log.md). The internal API for more advanced integration with g3log can be accessed in [API.md](docs/API.md)
+For more in-depth information please see the full usage description in [g3log.md](docs/g3log.md). The internal API for more advanced integration with g3log can be accessed in [API.md](docs/API.md)
 
 
 ## 1. Easy usage in files
@@ -101,7 +101,7 @@ The worst case latency is kept stable with no extreme peaks, in spite of any sud
 You can find it here: https://kjellkod.wordpress.com/2015/06/30/the-worlds-fastest-logger-vs-g3log/
 
 
-## <a name="continuos_integration">Continuos Integration</a>
+## <a name="continuous_integration">Continuous Integration</a>
 The g3log repository is evaluating both github actions and CircleCI for executing test coverage, installation and document generation. For windows the repo is still relying on appveyor.  In case you want to look into change any of these setups the following files are the ones of interest. 
 ```
 1. appveyor --> g3log/appveyor.yml
